@@ -3,7 +3,7 @@
 ### Problem Statement
 
 
-I am creating a tool that will predict the probability of flight delays and cancellations based on an individual's flight itinerary.
+I will build a regression model that will predict the probability that a given flight will be delayed or cancelled based on an individual's flight itinerary using publicly available Bureau of Transportation data.
 
 ---
 
