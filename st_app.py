@@ -66,8 +66,8 @@ if page == 'Flight Delay App':
 
     # Create the form to input the data
     with st.form(key='columns_in_form'):
-        col1, col2, col3, col4 = st.columns(4)
-        col5, col6 = st.columns(2)
+        col1, col2, col3, col4 = st.beta_columns(4)
+        col5, col6 = st.beta_columns(2)
         date_choice = col1.date_input('Select travel date')
         airline_choice = col2.selectbox('Select airline', airlines_list)
         origin_choice = col3.selectbox('Select origin', origins_list, index = 9)
