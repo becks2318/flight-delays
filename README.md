@@ -3,7 +3,7 @@
 ### Problem Statement
 
 
-I will build a regression model that will predict the probability that a given flight will be delayed or cancelled based on an individual's flight itinerary using publicly available Bureau of Transportation data.
+I will use machine learning to predict if a flight will be delayed using publicly available Bureau of Transportation data.
 
 ---
 
@@ -64,9 +64,6 @@ The following table contains the features that were used in the final model:
 |**nas_delay**|_float_|Bureau of Transportation Statistics|Flag if the delay was from National Air System|
 |**security_delay**|_float_|Bureau of Transportation Statistics|Flag if the delay was from security|
 |**late_aircraft_delay**|_float_|Bureau of Transportation Statistics|Flag if the delay was from late aircraft|
-
-
-Time Zone data: https://raw.githubusercontent.com/hroptatyr/dateutils/tzmaps/iata.tzmap
 
 
 ---
