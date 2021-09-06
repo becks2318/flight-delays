@@ -66,12 +66,12 @@ if page == 'Flight Delay App':
 
     # Create the form to input the data
     with st.form(key='columns_in_form'):
-        col1, col2, col3, col4 = st.beta_columns(4)
-        col5, col6 = st.beta_columns(2)
+        col1, col2, col3, col4 = st.columns(4)
+        col5, col6 = st.columns(2)
         date_choice = col1.date_input('Select travel date')
         airline_choice = col2.selectbox('Select airline', airlines_list)
-        origin_choice = col3.selectbox('Select origin', origins_list, index = 9)
-        dest_choice = col4.selectbox('Select destination', dest_list, index = 87)
+        origin_choice = col3.selectbox('Select origin', origins_list)
+        dest_choice = col4.selectbox('Select destination', dest_list)
         origin_time_choice = col5.time_input('Select departure time')
         dest_time_choice = col6.time_input('Select arrival time')
         submitted = st.form_submit_button('Submit')
@@ -92,75 +92,76 @@ if page == 'Flight Delay App':
     prob = pipe.predict_proba(result)[:,1]
     prob_format = (np.round(prob[0], 2) * 100)
 
-    st.write(f'This flight has a {prob_format}% chance of being delayed.')
+    if submitted:
+        st.write(f'This flight has a {prob_format}% chance of being delayed.')
 
-    maps = pd.read_csv('data/airport_lat_long.csv')
+        maps = pd.read_csv('data/airport_lat_long.csv')
 
-    longitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'longitude').item()
-    longitude_2 = maps[maps['iata_code'] == dest_choice].get(key = 'longitude').item()
-    latitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'latitude').item()
-    latitude_2 = maps[maps['iata_code'] == dest_choice].get(key = 'latitude').item()
+        longitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'longitude').item()
+        longitude_2 = maps[maps['iata_code'] == dest_choice].get(key = 'longitude').item()
+        latitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'latitude').item()
+        latitude_2 = maps[maps['iata_code'] == dest_choice].get(key = 'latitude').item()
 
 
-    flight_dict = [{'path': [[longitude_1, latitude_1], [longitude_2, latitude_2]], 'color': (255, 0, 0)}]
-    flight_df = pd.DataFrame(flight_dict)
+        flight_dict = [{'path': [[longitude_1, latitude_1], [longitude_2, latitude_2]], 'color': (255, 0, 0)}]
+        flight_df = pd.DataFrame(flight_dict)
 
-    ICON_URL = 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png'
-    icon_dict = {
-            'url': ICON_URL,
-            'width': 242,
-            'height': 242,
-            'anchorY': 242
-    }
+        ICON_URL = 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png'
+        icon_dict = {
+                'url': ICON_URL,
+                'width': 242,
+                'height': 242,
+                'anchorY': 242
+        }
 
-    AIRPLANE_URL = 'https://cdn2.iconfinder.com/data/icons/old-traditional-heritage/50/25-1024.png'
-    airplane_icon_dict = {
-        'url': AIRPLANE_URL,
-        'width': 100,
-        'height': 100
-    }
+        AIRPLANE_URL = 'https://cdn2.iconfinder.com/data/icons/old-traditional-heritage/50/25-1024.png'
+        airplane_icon_dict = {
+            'url': AIRPLANE_URL,
+            'width': 100,
+            'height': 100
+        }
 
-    location_list = [{'coordinates': [longitude_1, latitude_1], 'icon': icon_dict},
-                    {'coordinates': [longitude_2, latitude_2], 'icon': icon_dict}]
+        location_list = [{'coordinates': [longitude_1, latitude_1], 'icon': icon_dict},
+                        {'coordinates': [longitude_2, latitude_2], 'icon': icon_dict}]
 
-    airplane_data = [{'coordinates': [(longitude_1 + longitude_2)/2, (latitude_1 + latitude_2)/2],
-                    'icon': airplane_icon_dict}]
+        airplane_data = [{'coordinates': [(longitude_1 + longitude_2)/2, (latitude_1 + latitude_2)/2],
+                        'icon': airplane_icon_dict}]
 
-    view_state = pdk.data_utils.compute_view([[longitude_1, latitude_1], [longitude_2, latitude_2]])
+        view_state = pdk.data_utils.compute_view([[longitude_1, latitude_1], [longitude_2, latitude_2]])
 
-    layer = pdk.Layer(
-        type = 'PathLayer',
-        data = flight_df,
-        pickable = True,
-        get_color = 'color',
-        width_scale = 20,
-        width_min_pixels = 2,
-        get_path = 'path',
-        get_width = 5
-    )
+        layer = pdk.Layer(
+            type = 'PathLayer',
+            data = flight_df,
+            pickable = True,
+            get_color = 'color',
+            width_scale = 20,
+            width_min_pixels = 2,
+            get_path = 'path',
+            get_width = 5
+        )
 
-    icon_layer = pdk.Layer(
-        type = 'IconLayer',
-        data = location_list,
-        pickable = True,
-        get_icon = 'icon',
-        get_position = 'coordinates',
-        get_size = 4,
-        size_scale = 15,
-        id = 'map_icon'
-    )
+        icon_layer = pdk.Layer(
+            type = 'IconLayer',
+            data = location_list,
+            pickable = True,
+            get_icon = 'icon',
+            get_position = 'coordinates',
+            get_size = 4,
+            size_scale = 15,
+            id = 'map_icon'
+        )
 
-    airplane_layer = pdk.Layer(
-        type = 'IconLayer',
-        data = airplane_data,
-        pickable = True,
-        get_icon = 'icon',
-        get_position = 'coordinates',
-        get_size = 4,
-        size_scale = 10,
-        id = 'airplane_icon'
-    )
+        airplane_layer = pdk.Layer(
+            type = 'IconLayer',
+            data = airplane_data,
+            pickable = True,
+            get_icon = 'icon',
+            get_position = 'coordinates',
+            get_size = 4,
+            size_scale = 10,
+            id = 'airplane_icon'
+        )
 
-    r = pdk.Deck(layers = [layer, icon_layer, airplane_layer], initial_view_state = view_state, map_style = 'light', map_provider = 'mapbox')
+        r = pdk.Deck(layers = [layer, icon_layer, airplane_layer], initial_view_state = view_state, map_style = 'light', map_provider = 'mapbox')
 
-    st.pydeck_chart(r)
+        st.pydeck_chart(r)
