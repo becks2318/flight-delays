@@ -49,7 +49,7 @@ if page == 'Flight Delay App':
     st.title("Flight Delay App")
     st.write('''Please select the parameters for your flight from the dropdown options below:''')
 
-    # Read in the airlies list to create dropdown
+    # Read in the airlines list to create dropdown
     airlines_df = pd.read_csv('./data/airlines.csv')
     airlines_list = list(airlines_df.iloc[:, 0])
     sorted_airlines = airlines_list.sort()
@@ -88,13 +88,15 @@ if page == 'Flight Delay App':
     result = [[month_number, day_number, airline_choice, origin_choice, dest_choice,
     origin_time_choice, dest_time_choice]]
 
-    # Update the results column to say 'Not Cancelled' or 'Cancelled'
+    # Create the prediction result
     prob = pipe.predict_proba(result)[:,1]
     prob_format = (np.round(prob[0], 2) * 100)
 
+    # Once user clicks submit show the results and the map
     if submitted:
         st.write(f'This flight has a {prob_format}% chance of being delayed.')
 
+        # Read in the lat long file for the map
         maps = pd.read_csv('data/airport_lat_long.csv')
 
         longitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'longitude').item()
@@ -102,7 +104,7 @@ if page == 'Flight Delay App':
         latitude_1 = maps[maps['iata_code'] == origin_choice].get(key = 'latitude').item()
         latitude_2 = maps[maps['iata_code'] == dest_choice].get(key = 'latitude').item()
 
-
+        # Create a dictionary for flight lat longs for the map
         flight_dict = [{'path': [[longitude_1, latitude_1], [longitude_2, latitude_2]], 'color': (255, 0, 0)}]
         flight_df = pd.DataFrame(flight_dict)
 
@@ -127,8 +129,10 @@ if page == 'Flight Delay App':
         airplane_data = [{'coordinates': [(longitude_1 + longitude_2)/2, (latitude_1 + latitude_2)/2],
                         'icon': airplane_icon_dict}]
 
+        # Create the initial view for the map
         view_state = pdk.data_utils.compute_view([[longitude_1, latitude_1], [longitude_2, latitude_2]])
 
+        # Create a layer for the map to show the flight path
         layer = pdk.Layer(
             type = 'PathLayer',
             data = flight_df,
@@ -140,6 +144,7 @@ if page == 'Flight Delay App':
             get_width = 5
         )
 
+        # Create a layer for the map to show the pins for the airports
         icon_layer = pdk.Layer(
             type = 'IconLayer',
             data = location_list,
@@ -151,6 +156,7 @@ if page == 'Flight Delay App':
             id = 'map_icon'
         )
 
+        # Create a layer for the map to show the airplane icon
         airplane_layer = pdk.Layer(
             type = 'IconLayer',
             data = airplane_data,
@@ -162,6 +168,7 @@ if page == 'Flight Delay App':
             id = 'airplane_icon'
         )
 
+        # Render the map
         r = pdk.Deck(layers = [layer, icon_layer, airplane_layer], initial_view_state = view_state, map_style = 'light', map_provider = 'mapbox')
 
         st.pydeck_chart(r)
